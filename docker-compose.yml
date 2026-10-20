@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: preppilot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: preppilot
+      POSTGRES_PASSWORD: preppilot_dev_pw
+      POSTGRES_DB: preppilot
+    ports:
+      - '5432:5432'
+    volumes:
+      - preppilot-db-data:/var/lib/postgresql/data
+      # Creates the second database used only by `npm test` the first time the container starts.
+      #- ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U preppilot']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  preppilot-db-data:
